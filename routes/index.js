@@ -4,6 +4,19 @@ var util = require('util');
 
 var io = require('socket.io');
 
+var work_positive_sum = 0;
+var work_negative_sum = 0;
+var work_neutral_sum = 0;
+
+var study_positive_sum = 0;
+var study_negative_sum = 0;
+var study_neutral_sum = 0;
+
+var work_num = 0;
+var study_num = 0;
+var neutral_num = 0;
+
+
 exports.index = function (http) {
     io = io(http);
     return function (req, res) {
@@ -37,6 +50,18 @@ var initStream = function (session) {
                 if (data.user) {
                     var text = data.text;
 
+                    // if (text.indexOf('work') != -1) {
+                    //   work_num += 1;
+                    // } else if (text.indexOf('study') != -1) {
+                    //   study_num += 1;
+                    // } else {
+                    //   neutral_sum += 1;
+                    // }
+                    //
+                    // console.log(work_num);
+
+
+
                     var options = {
                       url: 'http://sentiment.vivekn.com/api/text/',
                       method: 'POST',
@@ -46,7 +71,33 @@ var initStream = function (session) {
                     }
 
                     request(options, function (error, response, body) {
-                      console.log(body);
+                      var temp = JSON.stringify(body);
+
+                      if (text.indexOf('work') != -1 || text.indexOf('work') != -1) {
+                        if (temp.indexOf('Positive') != -1) {
+                          work_positive_sum += 1;
+                        } else if (temp.indexOf('Negative') != -1) {
+                          work_negative_sum += 1;
+                        } else if (temp.indexOf('Neutral') != -1) {
+                          work_neutral_sum += 1;
+                        }
+                      } else if (text.indexOf('study') != -1 || text.indexOf('study')) {
+                        if (temp.indexOf('Positive') != -1) {
+                          study_positive_sum += 1;
+                        } else if (temp.indexOf('Negative') != -1) {
+                          study_negative_sum += 1;
+                        } else if (temp.indexOf('Neutral') != -1) {
+                          study_neutral_sum += 1;
+                        }
+                      }
+
+                      console.log(temp);
+                      console.log(work_positive_sum);
+                      console.log(work_negative_sum);
+                      console.log(work_neutral_sum);
+                      console.log(study_positive_sum);
+                      console.log(study_negative_sum);
+                      console.log(study_neutral_sum);
                     })
                 }
                 io.sockets.emit('newTweet', data);

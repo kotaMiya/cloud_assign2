@@ -1,7 +1,5 @@
 
 var express = require('express');
-
-var user = require('./routes/user');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
@@ -14,23 +12,24 @@ var twitter = require('twitter');
 
 var app = express();
 
+var user = require('./routes/user');
+
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 
-
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-app.use(cookieParser('keyboard cat secret'));
+app.use(cookieParser());
 app.use(session({
     genid: function (req) {
-        return uid(30); // use UUIDs for session IDs
+        return uid(30);
     },
     resave: true,
     saveUninitialized: true,
-    secret: 'keyboard cat secret'
+    secret: 'secret'
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -83,8 +82,6 @@ app.get('/auth/twitter/callback', function (req, res, next) {
                 } else {
                     req.session.oauth.access_token = oauth_access_token;
                     req.session.oauth.access_token_secret = oauth_access_token_secret;
-                    //console.log(results);
-                    //console.log(req);
 
                     var twit = new twitter({
                         consumer_key: "A6x1nzmmmerCCmVN8zTgew",
@@ -93,13 +90,7 @@ app.get('/auth/twitter/callback', function (req, res, next) {
                         access_token_secret: req.session.oauth.access_token_secret
                     });
 
-                    /*
-                     .updateStatus('Test tweet from ntwitter/' + twitter.VERSION,
-                     function (err, data) {
-                     console.log(err, data ? data.toString() : "");*/
                     res.redirect('/');
-                    /*}
-                     );*/
 
                 }
             }

@@ -25,11 +25,11 @@ function countTweets($scope) {
         // }
         if (item.text.indexOf('work') != -1 || item.text.indexOf('work') != -1) {
             $scope.countWork++;
-            item.color = 'blue';
+            item.color = '#F58E7E';
         }
-        else {
+        else if (item.text.indexOf('study') != -1 || item.text.indexOf('study')) {
             $scope.countStudy++;
-            item.color = 'green';
+            item.color = '#8DCF3F';
         }
 
         // console.log($scope.tweets[0].text);

@@ -2,28 +2,64 @@ doctype 5
 html(ng-app)
     head
         title= title
-        link(rel='stylesheet', href='/stylesheets/style.css')
         link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous")
+        link(rel='stylesheet', href='/stylesheets/style.css')
         script(src='/javascripts/angular.min.js')
         script(src='/javascripts/socket.io.js')
         script(src='/javascripts/main.js',type='text/javascript')
-        script(src='/javascripts/test.js',type='text/javascript')
-        script(src="http://d3js.org/d3.v3.min.js" charset="utf-8")
+
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js")
     body
         block content
 
         h1.text-center.h1= title
-        h1.text-center.h1= temp
 
         p.text-center
           a(href='/auth/twitter') Twitter Login.
 
-        .container
+        canvas#myChart1.col-xs-6.col-md-6(width="500")
+        canvas#myChart2.col-xs-6.col-md-6(width="500")
+
+
+        script.
+          var ctx1 = document.getElementById("myChart1").getContext('2d');
+          var ctx2 = document.getElementById("myChart2").getContext('2d');
+
+          var myChart = new Chart(ctx1, {
+          type: 'pie',
+            data: {
+              labels: ["Positive", "Negative", "Neutral"],
+              datasets: [{
+                backgroundColor: [
+                  "#FDC44F",
+                  "#5EBABA",
+                  "#737373"
+                ],
+                data: [12, 19, 5]
+              }]
+            }
+          });
+
+          var myChart = new Chart(ctx2, {
+          type: 'pie',
+            data: {
+              labels: ["Positive", "Negative", "Neutral"],
+              datasets: [{
+                backgroundColor: [
+                  "#FDC44F",
+                  "#5EBABA",
+                  "#737373"
+                ],
+                data: [12, 19, 5]
+              }]
+            }
+          });
+
 
         .content(ng-controller='countTweets')
             h2.text-center.h3 Total tweets: {{count}}
             h3.text-center.h4
-                span(style='color:blue')  Work: {{countWork}}
-                span(style='color:green')  Study: {{countStudy}}
+                span.col-lg-6(style='color:#F58E7E')  Work: {{countWork}}
+                span.col-lg-6(style='color:#8DCF3F')  Study: {{countStudy}}
             div(ng-repeat='t in tweets')
                 p(style='color:{{t.color}}') {{t.user.screen_name}}: {{t.text}}
