@@ -14,7 +14,7 @@ var app = express();
 
 var user = require('./routes/user');
 
-// all environments
+// set application environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -34,30 +34,36 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 var server = require('http').Server(app);
 console.log('Express server listening on port ' + app.get('port'));
 server.listen(app.get('port'));
+
 
 var routes = require('./routes');
 app.get('/', routes.index(server));
 
 
-var oa = new OAuth(
-    "https://api.twitter.com/oauth/request_token",
-    "https://api.twitter.com/oauth/access_token",
-    "A6x1nzmmmerCCmVN8zTgew",
-    "oOMuBkeqXLqoJkSklhpTrsvuZXo9VowyABS8EkAUw",
-    "1.0A",
-    "http://localhost:3000/auth/twitter/callback",
-    "HMAC-SHA1"
-);
-
+// twitter session
 app.get('/auth/twitter', function (req, res) {
+  // get the current url and make new OAuth object
+  var url_twitter = req.protocol + '://' + req.headers.host + req.url;
+  var point = url_twitter.search('3000');
+  point += 4;
+  var local_address = url_twitter.substring(7, point);
+  var right_address = 'http://' + local_address + '/auth/twitter/callback';
+  var oa = new OAuth(
+      "https://api.twitter.com/oauth/request_token",
+      "https://api.twitter.com/oauth/access_token",
+      "A6x1nzmmmerCCmVN8zTgew",
+      "oOMuBkeqXLqoJkSklhpTrsvuZXo9VowyABS8EkAUw",
+      "1.0A",
+      right_address,
+      "HMAC-SHA1"
+  );
+    // send oauth token to twitter to login
     oa.getOAuthRequestToken(function (error, oauth_token, oauth_token_secret, results) {
         if (error) {
             console.log(error);
-            res.send("yeah no. didn't work.")
         } else {
             req.session.oauth = {};
             req.session.oauth.token = oauth_token;
@@ -69,16 +75,34 @@ app.get('/auth/twitter', function (req, res) {
     });
 });
 
+// call callback page, and if all good, redirect to top page
 app.get('/auth/twitter/callback', function (req, res, next) {
     if (req.session.oauth) {
         req.session.oauth.verifier = req.query.oauth_verifier;
         var oauth = req.session.oauth;
 
+        var url_twitter = req.protocol + '://' + req.headers.host + req.url;
+        var point = url_twitter.search('3000');
+        point += 4;
+        var local_address = url_twitter.substring(7, point);
+
+        var twitter_address = "http://" + local_address + "/auth/twitter/callback";
+        console.log(twitter_address);
+
+        var oa = new OAuth(
+            "https://api.twitter.com/oauth/request_token",
+            "https://api.twitter.com/oauth/access_token",
+            "A6x1nzmmmerCCmVN8zTgew",
+            "oOMuBkeqXLqoJkSklhpTrsvuZXo9VowyABS8EkAUw",
+            "1.0A",
+            twitter_address,
+            "HMAC-SHA1"
+        );
+
         oa.getOAuthAccessToken(oauth.token, oauth.token_secret, oauth.verifier,
             function (error, oauth_access_token, oauth_access_token_secret, results) {
                 if (error) {
                     console.log(error);
-                    res.send("yeah something broke.");
                 } else {
                     req.session.oauth.access_token = oauth_access_token;
                     req.session.oauth.access_token_secret = oauth_access_token_secret;
@@ -95,6 +119,5 @@ app.get('/auth/twitter/callback', function (req, res, next) {
                 }
             }
         );
-    } else
-        next(new Error("you're not supposed to be here."))
+    }
 });

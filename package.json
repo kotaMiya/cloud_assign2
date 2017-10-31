@@ -20,6 +20,7 @@
     "oauth": "^0.9.10",
     "rapidapi-connect": "0.0.6",
     "redis": "^2.8.0",
+    "requests": "^0.2.2",
     "socket.io": "^1.3.7",
     "twitter": "^1.7.1",
     "uid": "0.0.2"

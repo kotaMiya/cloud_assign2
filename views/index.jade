@@ -14,52 +14,79 @@ html(ng-app)
 
         h1.text-center.h1= title
 
+        div#love-positive.col-xs-4.col-md-2(hidden)= love_positive
+        div#love-negative.col-xs-4.col-md-2(hidden)= love_negative
+        div#love-neutral.col-xs-4.col-md-2(hidden)= love_neutral
+        div#hello-positive.col-xs-4.col-md-2(hidden)= hello_positive
+        div#hello-negative.col-xs-4.col-md-2(hidden)= hello_negative
+        div#hello-neutral.col-xs-4.col-md-2(hidden)= hello_neutral
+
+
+
         p.text-center
           a(href='/auth/twitter') Twitter Login.
 
-        canvas#myChart1.col-xs-6.col-md-6(width="500")
-        canvas#myChart2.col-xs-6.col-md-6(width="500")
+        canvas#chart1.col-xs-6.col-md-5(width="280")
+        input#update_chart.col-xs-6.col-md-4.update-button(type='button', value='Update chart', onClick='updateChartData(work_chart, study_chart, love_p, negative1, neutral1, hello_p, negative2, neutral2)')
+        canvas#chart2.col-xs-6.col-md-5(width="280")
 
 
         script.
-          var ctx1 = document.getElementById("myChart1").getContext('2d');
-          var ctx2 = document.getElementById("myChart2").getContext('2d');
+          var love_p = document.getElementById("love-positive").textContent;
+          var negative1 = document.getElementById("love-negative").textContent;
+          var neutral1 = document.getElementById("love-neutral").textContent;
+          var hello_p = document.getElementById("hello-positive").textContent;
+          var negative2 = document.getElementById("hello-negative").textContent;
+          var neutral2 = document.getElementById("hello-neutral").textContent;
 
-          var myChart = new Chart(ctx1, {
-          type: 'pie',
-            data: {
-              labels: ["Positive", "Negative", "Neutral"],
-              datasets: [{
-                backgroundColor: [
-                  "#FDC44F",
-                  "#5EBABA",
-                  "#737373"
-                ],
-                data: [12, 19, 5]
-              }]
-            }
+          var ctx1 = document.getElementById("chart1").getContext('2d');
+          var ctx2 = document.getElementById("chart2").getContext('2d');
+
+          console.log(hello_p);
+
+          var work_chart = new Chart(ctx1, {
+            type: 'pie',
+              data: {
+                labels: ["Positive", "Negative", "Neutral"],
+                datasets: [{
+                  backgroundColor: [
+                    "#FDC44F",
+                    "#5EBABA",
+                    "#737373"
+                  ],
+                  data: [0, 0, 0]
+                }]
+              }
           });
 
-          var myChart = new Chart(ctx2, {
-          type: 'pie',
-            data: {
-              labels: ["Positive", "Negative", "Neutral"],
-              datasets: [{
-                backgroundColor: [
-                  "#FDC44F",
-                  "#5EBABA",
-                  "#737373"
-                ],
-                data: [12, 19, 5]
-              }]
-            }
+          var study_chart = new Chart(ctx2, {
+            type: 'pie',
+              data: {
+                labels: ["Positive", "Negative", "Neutral"],
+                datasets: [{
+                  backgroundColor: [
+                    "#FDC44F",
+                    "#5EBABA",
+                    "#737373"
+                  ],
+                  data: [0, 0, 0]
+                }]
+              }
           });
+
+          function updateChartData(chart1, chart2, positive1, negative1, neutral1, positive2, negative2, neutral2) {
+            // remove all data
+            remove_data(chart1, chart2);
+
+            // update all data
+            update_data(chart1, chart2, positive1, negative1, neutral1, positive2, negative2, neutral2);
+          }
 
 
         .content(ng-controller='countTweets')
             h2.text-center.h3 Total tweets: {{count}}
             h3.text-center.h4
-                span.col-lg-6(style='color:#F58E7E')  Work: {{countWork}}
-                span.col-lg-6(style='color:#8DCF3F')  Study: {{countStudy}}
+                span.col-lg-6(style='color:#F58E7E')  Love: {{countLove}}
+                span.col-lg-6(style='color:#8DCF3F')  Hello: {{countHello}}
             div(ng-repeat='t in tweets')
                 p(style='color:{{t.color}}') {{t.user.screen_name}}: {{t.text}}

@@ -7,3 +7,8 @@ body {
 a {
   color: #00B7FF;
 }
+
+.update-button {
+  margin-bottom: 20px;
+  width: 200px;
+}
